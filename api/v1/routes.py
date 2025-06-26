@@ -1,17 +1,18 @@
-from fastapi import FastAPI, APIRouter, HTTPException
-from fastapi import Depends
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel , Field
 from typing import List, Optional,Literal
 import json
 import uuid
 
 router= APIRouter()
 class Todolist(BaseModel):
-    id: str = str(uuid.uuid4())
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: Optional[str]=None
     description: Optional[str] = None
-
+class TodolistCreate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
 class TodoListResponse(BaseModel):
     status: Literal['success', 'error']
     data: List[Todolist]
@@ -21,23 +22,32 @@ class TodolistUpdate(BaseModel):
 
 
 @router.post("/todolist", response_model=TodoListResponse)
-async def create_todolist(todolist: List[Todolist]) -> TodoListResponse:
+async def create_todolist(todolist: List[TodolistCreate]) -> TodoListResponse:
     try:
         try:
             with open('todolist.json', 'r') as f:
                 existing_data = json.load(f)
         except FileNotFoundError:
-            existing_data = []  
+            existing_data = []
+
+        new_data = []
 
         for item in todolist:
-            existing_data.append(item.dict())
+
+            if item.title == "string" and item.description == "string":
+                return TodoListResponse(status="success", data=[Todolist(**i) for i in existing_data])
+
+            new_item = Todolist(title=item.title, description=item.description)
+            existing_data.append(new_item.model_dump())
+            new_data.append(new_item)
 
         with open('todolist.json', 'w') as f:
             json.dump(existing_data, f, indent=4)
 
+        return TodoListResponse(status="success", data=new_data)
+
     except Exception as e:
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
-    return TodoListResponse(status="success", data=[Todolist(**item) for item in existing_data])
 
 @router.get("/todolist", response_model=TodoListResponse)
 async def get_todolist() -> TodoListResponse:
@@ -51,35 +61,23 @@ async def get_todolist() -> TodoListResponse:
     
     return TodoListResponse(status="success", data=[Todolist(**item) for item in todolist])
 @router.put("/todolist/{id}", response_model=Todolist)
-async def update_todolist(id: int, update_data: TodolistUpdate) -> Todolist:
+async def update_todolist(id: str, update_data: TodolistUpdate) -> Todolist:
     try:
-        # Load existing data from file
+        
         with open('todolist.json', 'r') as f:
             data = json.load(f)
 
         for index, item in enumerate(data):
             if item['id'] == id:
-                # Make a copy of existing item
                 updated_item = item.copy()
-
-                # Extract only sent fields
+                
                 update_fields = update_data.model_dump(exclude_unset=True)
-
-                # Apply only non-None, non-"string" fields
                 for key, value in update_fields.items():
                     if value is not None and value != "string":
                         updated_item[key] = value
-
-                # Always preserve original ID
                 updated_item['id'] = id
-
-                # Validate using Pydantic
                 validated = Todolist(**updated_item)
-
-                # Update the list
                 data[index] = validated.model_dump()
-
-                # Save back to file
                 with open('todolist.json', 'w') as f:
                     json.dump(data, f, indent=4)
 
@@ -94,7 +92,7 @@ async def update_todolist(id: int, update_data: TodolistUpdate) -> Todolist:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/todolist/{id}", response_model=TodoListResponse)
-async def delete_todolist(id: int) -> TodoListResponse:
+async def delete_todolist(id: str) -> TodoListResponse:
     try:
         with open('todolist.json', 'r') as f:
             existing_todolist = json.load(f)
