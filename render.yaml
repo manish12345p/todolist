@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: todolist-api
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    autoDeploy: true
+    branch: manish
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
