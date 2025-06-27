@@ -1,26 +1,10 @@
+from api.v1.models import Todolist, TodolistCreate, TodolistUpdate
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from typing import List, Optional
+
+from typing import List
 import json
-import uuid
-
 router = APIRouter()
-
-class Todolist(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    title: Optional[str] = None
-    description: Optional[str] = None
-
-class TodolistCreate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-
-class TodolistUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-
-
 @router.post("/todolist", response_model=List[Todolist])
 async def create_todolist(todolist: List[TodolistCreate]) -> List[Todolist]:
     try:
