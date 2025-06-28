@@ -76,7 +76,7 @@ async def update_todolist(id: str, update_data: TodoItemUpdate) -> TodoItem:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/todo-item-detete/{id}", response_model=List[TodoItem])
+@router.delete("/todo-item-delete/{id}", response_model=List[TodoItem])
 async def delete_todolist(id: str) -> List[TodoItem]:
     try:
         with open('todolist.json', 'r') as f:
