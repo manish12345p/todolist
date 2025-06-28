@@ -1,12 +1,12 @@
-from api.v1.models import Todolist, TodolistCreate, TodolistUpdate
+from api.v1.models import TodoItem, TodoItemCreate, TodoItemUpdate
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
 from typing import List
 import json
 router = APIRouter()
-@router.post("/todolist", response_model=List[Todolist])
-async def create_todolist(todolist: List[TodolistCreate]) -> List[Todolist]:
+@router.post("/todo-item-create", response_model=List[TodoItem])
+async def create_todolist(todolist: List[TodoItemCreate]) -> List[TodoItem]:
     try:
         try:
             with open('todolist.json', 'r') as f:
@@ -18,9 +18,9 @@ async def create_todolist(todolist: List[TodolistCreate]) -> List[Todolist]:
 
         for item in todolist:
             if item.title == "string" and item.description == "string":
-                return [Todolist(**i) for i in existing_data]
+                return [TodoItem(**i) for i in existing_data]
 
-            new_item = Todolist(title=item.title, description=item.description)
+            new_item = TodoItem(title=item.title, description=item.description)
             existing_data.append(new_item.model_dump())
             new_data.append(new_item)
 
@@ -33,8 +33,8 @@ async def create_todolist(todolist: List[TodolistCreate]) -> List[Todolist]:
         return JSONResponse(status_code=500, content={"message": str(e)})
 
 
-@router.get("/todolist", response_model=List[Todolist])
-async def get_todolist() -> List[Todolist]:
+@router.get("/todo-items-read", response_model=List[TodoItem])
+async def get_todolist() -> List[TodoItem]:
     try:
         with open('todolist.json', 'r') as f:
             todolist = json.load(f)
@@ -43,11 +43,11 @@ async def get_todolist() -> List[Todolist]:
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
     
-    return [Todolist(**item) for item in todolist]
+    return [TodoItem(**item) for item in todolist]
 
 
-@router.put("/todolist/{id}", response_model=Todolist)
-async def update_todolist(id: str, update_data: TodolistUpdate) -> Todolist:
+@router.put("/todo-item-update/{id}", response_model=TodoItem)
+async def update_todolist(id: str, update_data: TodoItemUpdate) -> TodoItem:
     try:
         with open('todolist.json', 'r') as f:
             data = json.load(f)
@@ -60,7 +60,7 @@ async def update_todolist(id: str, update_data: TodolistUpdate) -> Todolist:
                     if value is not None and value != "string":
                         updated_item[key] = value
                 updated_item['id'] = id
-                validated = Todolist(**updated_item)
+                validated = TodoItem(**updated_item)
                 data[index] = validated.model_dump()
 
                 with open('todolist.json', 'w') as f:
@@ -76,8 +76,8 @@ async def update_todolist(id: str, update_data: TodolistUpdate) -> Todolist:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/todolist/{id}", response_model=List[Todolist])
-async def delete_todolist(id: str) -> List[Todolist]:
+@router.delete("/todo-item-detete/{id}", response_model=List[TodoItem])
+async def delete_todolist(id: str) -> List[TodoItem]:
     try:
         with open('todolist.json', 'r') as f:
             existing_todolist = json.load(f)
@@ -95,4 +95,4 @@ async def delete_todolist(id: str) -> List[Todolist]:
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": str(e)})
 
-    return [Todolist(**item) for item in new_todolist]
+    return [TodoItem(**item) for item in new_todolist]

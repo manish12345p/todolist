@@ -1,15 +1,15 @@
 from pydantic import BaseModel, Field
 import uuid
 from typing import Optional
-class Todolist(BaseModel):
+class TodoItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: Optional[str] = None
     description: Optional[str] = None
 
-class TodolistCreate(BaseModel):
+class TodoItemCreate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
 
-class TodolistUpdate(BaseModel):
+class TodoItemUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
