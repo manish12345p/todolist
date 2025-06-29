@@ -82,7 +82,7 @@ async def update_todo_item(request: Request,id: str, update_data: TodoItemUpdate
                 validated = TodoItem(**updated_item)
                 data[index] = validated.model_dump()
 
-                with open(f'{device_id}t.json', 'w') as f:
+                with open(f'{device_id}.json', 'w') as f:
                     json.dump(data, f, indent=4)
 
                 return validated
