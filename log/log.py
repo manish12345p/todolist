@@ -12,5 +12,5 @@ async def log_requests(request: Request, call_next):
         elif response.status_code >=400 and response.status_code < 500:
             logging.error(f"Method: {request.method} | Url : {request.url} | Status : {response.status_code} {HTTPStatus(response.status_code).phrase}")
     except Exception as e:
-        logging.error(f"Method:{request.method} | Url : {request.url} | Status:{response.status_code} {HTTPStatus(response.status_code).phrase} | Error logging request: {e}")
+        logging.error(f"Method:{request.method} | Url : {request.url} | Status:{response.status_code} {HTTPStatus(response.status_code).phrase} | Error : {e}")
     return response
