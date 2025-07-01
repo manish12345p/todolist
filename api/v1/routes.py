@@ -13,10 +13,10 @@ async def create_todo_item(request: Request ,todo_item: List[TodoItemCreate]) ->
         if not device_id:
             raise HTTPException(status_code=400, detail="Missing Device-ID in header")
         if not os.path.exists(f'{device_id}.json'):
-            with open(f'{device_id}.json', 'w') as f:
+            with open(f'data/{device_id}.json', 'w') as f:
                 json.dump([], f, indent=4)
         try:
-            with open(f'{device_id}.json', 'r') as f:
+            with open(f'data/{device_id}.json', 'r') as f:
                 existing_data = json.load(f)
         except FileNotFoundError:
             existing_data = []
@@ -34,7 +34,7 @@ async def create_todo_item(request: Request ,todo_item: List[TodoItemCreate]) ->
             existing_data.append(new_item.model_dump())
             new_data.append(new_item)
 
-        with open(f'{device_id}.json', 'w') as f:
+        with open(f'data/{device_id}.json', 'w') as f:
             json.dump(existing_data, f, indent=4)
 
         return new_data
@@ -49,10 +49,10 @@ async def get_todo_items(request: Request) -> List[TodoItem]:
         device_id=request.headers.get("Device-Id")
         if not device_id:
             raise HTTPException(status_code=400, detail="Missing Device-ID in header")
-        if not os.path.exists(f'{device_id}.json'):
-            with open(f'{device_id}.json', 'w') as f:
+        if not os.path.exists(f'data/{device_id}.json'):
+            with open(f'data/{device_id}.json', 'w') as f:
                 json.dump([], f, indent=4)
-        with open(f'{device_id}.json', 'r') as f:
+        with open(f'data/{device_id}.json', 'r') as f:
             todolist = json.load(f)
     except FileNotFoundError:
         return []
@@ -68,7 +68,7 @@ async def update_todo_item(request: Request,id: str, update_data: TodoItemUpdate
         device_id=request.headers.get("Device-Id")
         if not device_id:
             raise HTTPException(status_code=400, detail="Missing Device-ID in header")  
-        with open(f'{device_id}.json', 'r') as f:
+        with open(f'data/{device_id}.json', 'r') as f:
             data = json.load(f)
 
         for index, item in enumerate(data):
@@ -82,7 +82,7 @@ async def update_todo_item(request: Request,id: str, update_data: TodoItemUpdate
                 validated = TodoItem(**updated_item)
                 data[index] = validated.model_dump()
 
-                with open(f'{device_id}.json', 'w') as f:
+                with open(f'data/{device_id}.json', 'w') as f:
                     json.dump(data, f, indent=4)
 
                 return validated
@@ -101,7 +101,7 @@ async def delete_todo_item(request: Request,id: str) -> List[TodoItem]:
         device_id=request.headers.get("Device-Id")
         if not device_id:
             raise HTTPException(status_code=400, detail="Missing Device-ID in header")
-        with open(f'{device_id}.json', 'r') as f:
+        with open(f'data/{device_id}.json', 'r') as f:
             existing_todolist = json.load(f)
         
         new_todolist = [item for item in existing_todolist if item['id'] != id]
@@ -109,7 +109,7 @@ async def delete_todo_item(request: Request,id: str) -> List[TodoItem]:
         if len(new_todolist) == len(existing_todolist):
             return JSONResponse(status_code=404, content={"message": "Item not found"})
 
-        with open(f'{device_id}.json', 'w') as f:
+        with open(f'data/{device_id}.json', 'w') as f:
             json.dump(new_todolist, f, indent=4)
 
     except FileNotFoundError:
