@@ -12,7 +12,7 @@ async def create_todo_item(request: Request ,todo_item: List[TodoItemCreate]) ->
         device_id=request.headers.get("Device-Id")
         if not device_id:
             raise HTTPException(status_code=400, detail="Missing Device-ID in header")
-        if not os.path.exists(f'{device_id}.json'):
+        if not os.path.exists(f'data/{device_id}.json'):
             with open(f'data/{device_id}.json', 'w') as f:
                 json.dump([], f, indent=4)
         try:
