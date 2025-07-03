@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, Field ,validator
 import uuid
 from typing import Optional
 class TodoItem(BaseModel):
@@ -21,8 +22,8 @@ class TodoItemCreate(BaseModel):
 
     @validator('description')
     def description_min_length(cls, v):
-        if v is not None and len(v) < 10:
-            raise ValueError("Description must be at least 10 characters long.")
+        if v is not None and len(v) < 3:
+            raise ValueError("Description must be at least 3 characters long.")
         return v
 
 class TodoItemUpdate(BaseModel):
@@ -37,6 +38,6 @@ class TodoItemUpdate(BaseModel):
 
     @validator('description')
     def description_min_length(cls, v):
-        if v is not None and len(v) < 10:
-            raise ValueError("Description must be at least 10 characters long.")
+        if v is not None and len(v) < 3:
+            raise ValueError("Description must be at least 3 characters long.")
         return v

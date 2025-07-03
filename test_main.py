@@ -6,8 +6,8 @@ import json
 client = TestClient(app)
 device_id="test_main"
 def cleanup_device_file(device_id: str):
-    if os.path.exists(f'{device_id}.json'):
-        os.remove(f'{device_id}.json')
+    if os.path.exists(f'data/{device_id}.json'):
+        os.remove(f'data/{device_id}.json')
 
 def test_create_todo_item():
     cleanup_device_file(device_id)
